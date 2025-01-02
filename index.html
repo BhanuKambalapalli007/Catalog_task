@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polynomial Constant Finder</title>
+    <script>
+        // Function to load JSON files using fetch
+        async function loadJson(filepath) {
+            const response = await fetch(filepath);
+            if (!response.ok) throw new Error(`Failed to load ${filepath}`);
+            return await response.json();
+        }
+
+        // Function to decode a value from a specific base
+        function decodeValue(base, value) {
+            return parseInt(value, base);
+        }
+
+        // Function to perform Lagrange Interpolation
+        function lagrangeInterpolation(points) {
+            let constant = 0;
+            const n = points.length;
+
+            for (let i = 0; i < n; i++) {
+                let [xi, yi] = points[i];
+                let term = yi;
+
+                for (let j = 0; j < n; j++) {
+                    if (i !== j) {
+                        let [xj, _] = points[j];
+                        term *= -xj / (xi - xj);
+                    }
+                }
+
+                constant += term;
+            }
+
+            return Math.round(constant);
+        }
+
+        // Main function to parse JSON and solve the problem
+        async function parseJsonAndSolve(filepath) {
+            const data = await loadJson(filepath);
+            const { keys, ...roots } = data;
+            const { n, k } = keys;
+
+            const points = [];
+            for (let key in roots) {
+                const { base, value } = roots[key];
+                points.push([parseInt(key), decodeValue(parseInt(base), value)]);
+            }
+
+            points.sort((a, b) => a[0] - b[0]); // Sort points by x
+            return lagrangeInterpolation(points.slice(0, k));
+        }
+
+        // Main execution function
+        async function main() {
+            try {
+                const testCase1 = './testcase1.json'; // Replace with actual path
+                const testCase2 = './testcase2.json'; // Replace with actual path
+
+                const secret1 = await parseJsonAndSolve(testCase1);
+                const secret2 = await parseJsonAndSolve(testCase2);
+
+                document.getElementById('output').innerHTML = `
+                    <p>Secret for Test Case 1: ${secret1}</p>
+                    <p>Secret for Test Case 2: ${secret2}</p>
+                `;
+            } catch (error) {
+                console.error("Error:", error.message);
+                document.getElementById('output').textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Call main function after page loads
+        window.onload = main;
+    </script>
+</head>
+<body>
+    <h1>Polynomial Constant Finder</h1>
+    <div id="output">Loading...</div>
+</body>
+</html>
