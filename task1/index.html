@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Polynomial Constant Finder</title>
     <script>
-        // Function to load JSON files using fetch
+    
         async function loadJson(filepath) {
             const response = await fetch(filepath);
             if (!response.ok) throw new Error(`Failed to load ${filepath}`);
             return await response.json();
         }
 
-        // Function to decode a value from a specific base
+      
         function decodeValue(base, value) {
             return parseInt(value, base);
         }
 
-        // Function to perform Lagrange Interpolation
+       
         function lagrangeInterpolation(points) {
             let constant = 0;
             const n = points.length;
@@ -39,7 +39,7 @@
             return Math.round(constant);
         }
 
-        // Main function to parse JSON and solve the problem
+       
         async function parseJsonAndSolve(filepath) {
             const data = await loadJson(filepath);
             const { keys, ...roots } = data;
@@ -55,7 +55,7 @@
             return lagrangeInterpolation(points.slice(0, k));
         }
 
-        // Main execution function
+       
         async function main() {
             try {
                 const testCase1 = './testcase1.json'; // Replace with actual path
